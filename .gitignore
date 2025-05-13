@@ -1,0 +1,41 @@
+# 編譯輸出
+bin/
+obj/
+
+# NuGet 包
+packages/
+*.nupkg
+*.snupkg
+
+# Visual Studio 相關
+.vs/
+*.user
+*.suo
+*.sln.docstates
+*.cachefile
+*.vcxproj.user
+*.csproj.user
+
+# Rider 相關
+.idea/
+
+# Test 結果
+TestResults/
+
+# 發布輸出
+publish/
+
+# Node.js (如果前端有用到)
+node_modules/
+
+# Docker
+docker-compose*.yaml
+
+# 環境變數
+*.env
+*.config
+appsettings.Development.json # 避免追蹤開發環境設定
+
+# 作業系統相關
+.DS_Store
+Thumbs.db

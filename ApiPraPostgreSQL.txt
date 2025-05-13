@@ -1,0 +1,23 @@
+dpg-d0hfknbe5dus73b02qng-a.oregon-postgres.render.com
+
+5432
+
+renderpostgres_1hq9
+
+renderpostgres_1hq9_user
+
+3Ng0ti0PQ4QM29VXyP8Nkso5r8yk9BZK
+
+
+├── Controllers/
+├── Data/                      # 放 DbContext
+├── Models/
+├── Services/
+├── Configuration/
+├── Repositories/
+├── Utilities/                 # 放小工具
+├── .editorconfig
+├── .gitignore
+├── LICENSE
+├── README.md
+└── YourProjectName.sln
