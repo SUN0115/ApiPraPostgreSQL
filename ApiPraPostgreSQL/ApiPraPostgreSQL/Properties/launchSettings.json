@@ -1,4 +1,6 @@
-﻿{
+﻿// 用來配置你的 ASP.NET Core 應用程式在開發環境中如何啟動和運行時的設定。它定義了不同的啟動設定檔（profiles）
+// 例如 "http"、"https" 和 "IIS Express"
+{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "iisSettings": {
     "windowsAuthentication": false,
