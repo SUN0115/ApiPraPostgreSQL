@@ -35,6 +35,8 @@ namespace ApiPraPostgreSQL.Repositories
 
         public async Task UpdateAsync(Product product)
         {
+
+
             _dbContext.Entry(product).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
         }
