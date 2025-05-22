@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ApiPraPostgreSQL.Models;
 using ApiPraPostgreSQL.Repositories;
 using ApiPraPostgreSQL.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiPraPostgreSQL.Services
 {
@@ -32,14 +33,17 @@ namespace ApiPraPostgreSQL.Services
             return true;
         }
 
-        public async Task<bool> UpdateProductAsync(int id, Product product)
+        public async Task<bool> UpdateProductAsync(Product product)
         {
-            var existingProduct = await _productRepository.GetByIdAsync(id);
-            if (existingProduct == null || id != product.id)
+            var existingProduct = await _productRepository.GetByIdAsync(product.id);
+            if (existingProduct == null)
             {
                 return false;
             }
-            await _productRepository.UpdateAsync(product);
+            existingProduct.name = product.name;
+            existingProduct.price = product.price;
+
+            await _productRepository.UpdateAsync(existingProduct);
             return true;
         }
 

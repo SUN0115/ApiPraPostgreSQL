@@ -68,7 +68,8 @@ namespace ApiPraPostgreSQL.Controllers // 定義控制器所在的命名空間
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost("getProductFromBody_int")] // 自訂路由名稱，避免與原有的 GetProduct 衝突
+        [HttpPost("getProductFromBody_int")]
+        // 發送: https://localhost:7181/api/Products/getProductFromBody_int
         public async Task<ActionResult<Product>> GetProductFromBody([FromBody] int id)
         {
             var product = await _productService.GetProductByIdAsync(id);
@@ -85,6 +86,7 @@ namespace ApiPraPostgreSQL.Controllers // 定義控制器所在的命名空間
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("getProductFromBody_json")]
+        // 發送: https://localhost:7181/api/Products/getProductFromBody_json
         public async Task<ActionResult<Product>> GetProductFromBody([FromBody] ProductIdRequest request)
         {
             if (request == null || !ModelState.IsValid)
@@ -103,50 +105,68 @@ namespace ApiPraPostgreSQL.Controllers // 定義控制器所在的命名空間
             return Ok(product);
         }
 
-        // HTTP POST 請求處理方法，用於創建新的產品
+        /// <summary>
+        /// HTTP POST 請求處理方法，用於創建新的產品
+        /// </summary>
+        /// <param name="product"></param>
+        /// <returns></returns>
         [HttpPost]
+        // 發送: 
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-            // 檢查模型狀態是否有效（例如，是否滿足資料驗證規則）
-            if (ModelState.IsValid)
+            // 檢查模型狀態是否有效（例如，是否滿足資料驗證規則，這些規則通常在 Product 模型類別中使用 Data Annotations 定義）
+            if (ModelState.IsValid)
             {
-                await _productService.CreateProductAsync(product); // 非同步呼叫 _productService 的 CreateProductAsync 方法，創建新的產品
-                // 回傳 HTTP 201 Created 狀態碼，並在 Location 標頭中包含新創建產品的 URI
-                return CreatedAtAction(nameof(GetProduct), new { id = product.id }, product);
+                await _productService.CreateProductAsync(product); // 非同步呼叫 _productService 的 CreateProductAsync 方法，將傳入的 Product 物件保存到資料庫中
+                // 回傳 HTTP 201 Created 狀態碼，表示資源已成功創建，並在 Location 標頭中包含新創建產品的 URI，方便客戶端獲取新資源
+                return CreatedAtAction(nameof(GetProduct), new { id = product.id }, product);
             }
-            // 如果模型狀態無效，回傳 HTTP 400 Bad Request 狀態碼，並包含驗證錯誤資訊
-            return BadRequest(ModelState);
+            // 如果模型狀態無效（例如，缺少必要的欄位或欄位格式不正確），回傳 HTTP 400 Bad Request 狀態碼，並包含 ModelState 中的驗證錯誤資訊，告知客戶端請求存在問題
+            return BadRequest(ModelState);
         }
 
-        // HTTP PUT 請求處理方法，用於根據 ID 更新現有的產品
-        [HttpPut("{id}")] // "{id}" 是路由參數，用於接收要更新的產品的 ID
-        public async Task<IActionResult> UpdateProduct(int id, Product product)
+        /// <summary>
+        /// HTTP PUT 請求處理方法，用於修改產品
+        /// </summary>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        [HttpPut]
+        // 發送(put): https://localhost:7181/api/Products
+        public async Task<IActionResult> UpdateProduct(Product product)
         {
-            // 檢查路由中的 ID 是否與請求體中的產品 ID 相符
-            if (id != product.id)
-            {
-                return BadRequest(); // 如果 ID 不符，回傳 HTTP 400 Bad Request 狀態碼
-            }
-
             // 檢查模型狀態是否有效
             if (ModelState.IsValid)
             {
-                var updated = await _productService.UpdateProductAsync(id, product); // 非同步呼叫 _productService 的 UpdateProductAsync 方法，更新產品
-                if (updated) // 檢查產品是否成功更新
+                if (product == null || product.id == 0) // 確保請求體不為空且包含有效的 ID
                 {
-                    return NoContent(); // 如果更新成功，回傳 HTTP 204 No Content 狀態碼
+                    return BadRequest("請求體必須包含有效的產品資訊，包括 ID。");
                 }
-                return NotFound(); // 如果找不到要更新的產品，回傳 HTTP 404 Not Found 狀態碼
+
+                // 可改回傳值
+                var updated = await _productService.UpdateProductAsync(product); // 從 Product 物件中獲取 ID
+                if (updated)
+                {
+                    return NoContent();
+                }
+                return NotFound(); // 如果找不到具有該 ID 的產品
             }
-            // 如果模型狀態無效，回傳 HTTP 400 Bad Request 狀態碼，並包含驗證錯誤資訊
             return BadRequest(ModelState);
         }
 
-        // HTTP DELETE 請求處理方法，用於根據 ID 刪除現有的產品
-        [HttpDelete("{id}")] // "{id}" 是路由參數，用於接收要刪除的產品的 ID
-        public async Task<IActionResult> DeleteProduct(int id)
+        /// <summary>
+        /// HTTP DELETE 請求處理方法，用於根據 ID 刪除現有的產品
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete] 
+        // 發送(Delete): https://localhost:7181/api/Products
+        public async Task<IActionResult> DeleteProduct([FromBody] ProductIdRequest request)
         {
-            var deleted = await _productService.DeleteProductAsync(id); // 非同步呼叫 _productService 的 DeleteProductAsync 方法，刪除產品
+            if (request == null || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // 處理請求體為空或模型驗證失敗的情況
+            }
+            var deleted = await _productService.DeleteProductAsync(request.Id); // 非同步呼叫 _productService 的 DeleteProductAsync 方法，刪除產品
             if (deleted) // 檢查產品是否成功刪除
             {
                 return NoContent(); // 如果刪除成功，回傳 HTTP 204 No Content 狀態碼
